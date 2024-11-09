@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import { useAuthContext } from "./context/AuthContext";
 import Register from "./pages/Register";
@@ -9,6 +9,10 @@ import Reset from "./pages/Reset";
 import Home from "./pages/Home";
 import Chat from "./pages/Home/Chat";
 import Profile from "./pages/Home/Profile";
+import Admin from "./pages/Admin";
+import UserList from "./pages/Admin/Users/List";
+import UserAdd from "./pages/Admin/Users/Add";
+import Groups from "./pages/Admin/Groups";
 
 function App() {
   const { authUser } = useAuthContext();
@@ -28,7 +32,12 @@ function App() {
 
         <Route path="/" element={<Home />}>
           <Route index path="/chat" element={<Chat />} />
-          <Route index path="/profile" element={<Profile />} />
+          <Route path="/profile" element={<Profile />} />
+        </Route>
+        <Route path="/admin" element={<Admin />}>
+          {/* <Route path="/admin" element={<Navigate to="/admin/users" />} /> */}
+          <Route path="/admin/users" element={<UserList />} />
+          <Route path="/admin/groups" element={<Groups />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import defaultUser from "../../assets/default-user.jpg";
 import { useAuthContext } from "../../context/AuthContext";
 import useProfile from "../../hooks/useProfile";
+import { toDataURL } from "../../utils/file";
 
 function Profile() {
   const { authUser } = useAuthContext();
@@ -27,15 +28,33 @@ function Profile() {
     e.preventDefault();
     changePassword(formPassword);
   };
+
+  const handleChangeAvatar = async (e) => {
+    const file = e.target.files[0];
+    const dataUrl = await toDataURL(file);
+    setFormState({ ...formState, avatar: dataUrl });
+  };
+
   return (
     <div className="rounded-2xl bg-white h-full flex justify-center items-center">
       <div className="w-[500px]">
-        <img
-          src={authUser.avatar || defaultUser}
-          alt=""
-          className="size-24 rounded-full m-auto"
-        />
         <form onSubmit={handleSubmit}>
+          <div className="mt-2">
+            <label htmlFor="avatar">
+              <img
+                src={formState.avatar || defaultUser}
+                alt=""
+                className="size-24 rounded-full m-auto border-2 border-gray-950 border-solid cursor-pointer object-cover"
+              />
+            </label>
+            <input
+              className="invisible"
+              type="file"
+              id="avatar"
+              accept="image/*"
+              onChange={handleChangeAvatar}
+            />
+          </div>
           <div className="mt-2">
             <label className="w-32 inline-block" htmlFor="name">
               Email
