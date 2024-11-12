@@ -1,11 +1,14 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
-import useLogout from "../hooks/useLogout";
 import { ChatIcon, LogoutIcon, ProfileIcon } from "../components/Icon";
+import useAuth from "../hooks/useAuth";
 
 const GroupLink = () => (
   <div className="text-center">
-    <NavLink className="my-1 block hover:text-white hover:bg-gray-700 rounded p-1 cursor-pointer">
+    <NavLink
+      to={"/chat"}
+      className="my-1 block hover:text-white hover:bg-gray-700 rounded p-1 cursor-pointer"
+    >
       <ChatIcon className="size-8 mx-auto" />
       <span className="text-sm">All chat</span>
     </NavLink>
@@ -21,7 +24,7 @@ const GroupLink = () => (
 
 function Home({ children }) {
   const { authUser } = useAuthContext();
-  const logout = useLogout();
+  const { logout } = useAuth();
 
   return (
     <div className="h-screen bg-gray-950 flex">

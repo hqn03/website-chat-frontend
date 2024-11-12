@@ -1,84 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import useShow from "../../../hooks/useShow";
-import Modal from "../../../components/Modal/Modal";
+import useShow from "../../hooks/useShow";
+import Modal from "../../components/Modal/Modal";
 import { Field, Label, Radio, RadioGroup } from "@headlessui/react";
+import useUser from "../../hooks/useUser";
 
-const roles = ["admin", "moderate", "normal"];
-const users = [
-  {
-    id: 1,
-    username: "hswigg0",
-    email: "skeoghane0@soundcloud.com",
-    role: "admin",
-    verified: false,
-  },
-  {
-    id: 2,
-    username: "mkille1",
-    email: "ebaldassi1@senate.gov",
-    role: "normal",
-    verified: true,
-  },
-  {
-    id: 3,
-    username: "njacobowits2",
-    email: "bmaryott2@constantcontact.com",
-    role: "normal",
-    verified: false,
-  },
-  {
-    id: 4,
-    username: "dthyer3",
-    email: "memons3@seattletimes.com",
-    role: "normal",
-    verified: true,
-  },
-  {
-    id: 5,
-    username: "arawlyns4",
-    email: "iryall4@example.com",
-    role: "normal",
-    verified: true,
-  },
-  {
-    id: 6,
-    username: "esommers5",
-    email: "slukas5@blogtalkradio.com",
-    role: "normal",
-    verified: false,
-  },
-  {
-    id: 7,
-    username: "amcveigh6",
-    email: "bbleakley6@imgur.com",
-    role: "normal",
-    verified: true,
-  },
-  {
-    id: 8,
-    username: "mgartsyde7",
-    email: "dspavins7@home.pl",
-    role: "normal",
-    verified: false,
-  },
-  {
-    id: 9,
-    username: "kaddicott8",
-    email: "zearley8@studiopress.com",
-    role: "normal",
-    verified: false,
-  },
-  {
-    id: 10,
-    username: "hbrookson9",
-    email: "csenett9@networkadvertising.org",
-    role: "normal",
-    verified: true,
-  },
-];
+const roles = ["moderate", "normal"];
 
-function UserList() {
+function Users() {
   const [showAdd, toggleShowAdd] = useShow();
   const [showEdit, toggleShowEdit] = useShow();
   const [showDelete, toggleShowDelete] = useShow();
@@ -87,11 +16,21 @@ function UserList() {
     email: "",
     password: "",
   });
-  const [user, setUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [users, setUsers] = useState([]);
 
-  const handleSubmitAddForm = (e) => {
+  const { loading, getUsers, createUser, updateRole, deleteUser } = useUser();
+
+  useEffect(() => {
+    getUsers().then((data) => setUsers(data));
+  }, []);
+
+  //   Add function
+  const handleSubmitAddForm = async (e) => {
     e.preventDefault();
-    console.log(formAdd);
+    const dataUser = await createUser(formAdd);
+    handleResetAddForm();
+    setUsers([...users, dataUser]);
   };
   const handleResetAddForm = () => {
     toggleShowAdd();
@@ -104,22 +43,34 @@ function UserList() {
 
   //   Edit function
   const handleEdit = (user) => {
-    setUser(user);
+    setSelectedUser(user);
     toggleShowEdit();
   };
   const handleSubmitUpdateForm = (e) => {
     e.preventDefault();
-    console.log(user);
+    if (updateRole(selectedUser)) {
+      toggleShowEdit();
+      //   Update users directly after update role
+      const newUsers = users.map((user) =>
+        user.id === selectedUser.id ? { ...user, ...selectedUser } : user
+      );
+      setUsers(newUsers);
+    }
   };
 
   //   Delete function
   const handleConfirmDelete = (user) => {
-    setUser(user);
+    setSelectedUser(user);
     toggleShowDelete();
   };
 
-  const handleDelete = () => {
-    console.log(user);
+  const handleDelete = async () => {
+    if (await deleteUser(selectedUser)) {
+      toggleShowDelete();
+      //   Delete user directly after delete
+      const newUsers = users.filter((item) => item.id !== selectedUser.id);
+      setUsers(newUsers);
+    }
   };
 
   return (
@@ -158,7 +109,7 @@ function UserList() {
               <td className="px-4 py-2">{user.username}</td>
               <td className="px-4 py-2">{user.email}</td>
               <td className="px-4 py-2">{user.role}</td>
-              <td className="px-4 py-2">{user.verified ? "yes" : "no"}</td>
+              <td className="px-4 py-2">{user.is_verified ? "yes" : "no"}</td>
               <td className="px-4 py-2">
                 <button
                   className="text-blue-500 hover:underline"
@@ -237,6 +188,7 @@ function UserList() {
             <button
               type="submit"
               className="ml-2 px-4 py-2 bg-green-500 rounded"
+              disabled={loading}
             >
               Add
             </button>
@@ -256,7 +208,7 @@ function UserList() {
               id="username"
               type="text"
               className="p-1 border-gray-500 border-2 border-solid rounded-md flex-1"
-              value={user?.username}
+              value={selectedUser?.username}
               disabled
             />
           </div>
@@ -268,15 +220,15 @@ function UserList() {
               id="email"
               type="text"
               className="p-1 border-gray-500 border-2 border-solid rounded-md flex-1"
-              value={user?.email}
+              value={selectedUser?.email}
               disabled
             />
           </div>
           <div className="flex mt-3">
             <span className="w-32">Role</span>
             <RadioGroup
-              value={user?.role}
-              onChange={(e) => setUser({ ...user, role: e })}
+              value={selectedUser?.role}
+              onChange={(e) => setSelectedUser({ ...selectedUser, role: e })}
               className="flex gap-4 "
             >
               {roles.map((role) => (
@@ -315,7 +267,10 @@ function UserList() {
         <div className="text-2xl">Delete user</div>
         <div className="mt-4">
           Do you really want delete user
-          <span className="font-medium text-red-500"> {user?.email}</span>
+          <span className="font-medium text-red-500">
+            {" "}
+            {selectedUser?.email}
+          </span>
         </div>
         <div className="text-end text-white mt-4">
           <button
@@ -338,4 +293,4 @@ function UserList() {
   );
 }
 
-export default UserList;
+export default Users;

@@ -10,9 +10,8 @@ import Home from "./pages/Home";
 import Chat from "./pages/Home/Chat";
 import Profile from "./pages/Home/Profile";
 import Admin from "./pages/Admin";
-import UserList from "./pages/Admin/Users/List";
-import UserAdd from "./pages/Admin/Users/Add";
 import Groups from "./pages/Admin/Groups";
+import Users from "./pages/Admin/Users";
 
 function App() {
   const { authUser } = useAuthContext();
@@ -25,18 +24,32 @@ function App() {
         pauseOnHover={false}
       />
       <Routes>
+        <Route
+          path="/"
+          element={
+            authUser ? (
+              authUser.role === "admin" ? (
+                <Navigate to={"/admin"} />
+              ) : (
+                <Navigate to={"/"} />
+              )
+            ) : (
+              <Navigate to={"/login"} />
+            )
+          }
+        />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="forgot" element={<Forgot />} />
-        <Route path="reset-password/:uid/:token" element={<Reset />} />
+        <Route path="password-reset-confirm/:uid/:token" element={<Reset />} />
 
         <Route path="/" element={<Home />}>
-          <Route index path="/chat" element={<Chat />} />
+          <Route path="/chat" element={<Chat />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
         <Route path="/admin" element={<Admin />}>
-          {/* <Route path="/admin" element={<Navigate to="/admin/users" />} /> */}
-          <Route path="/admin/users" element={<UserList />} />
+          <Route path="/admin" element={<Navigate to="/admin/users" />} />
+          <Route path="/admin/users" element={<Users />} />
           <Route path="/admin/groups" element={<Groups />} />
         </Route>
       </Routes>

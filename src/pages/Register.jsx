@@ -1,6 +1,5 @@
 import { useState } from "react";
-import useLogin from "../hooks/useLogin";
-import useRegister from "../hooks/useRegister";
+import useAuth from "../hooks/useAuth";
 
 function Register() {
   const [formState, setFormState] = useState({
@@ -9,7 +8,7 @@ function Register() {
     password: "",
     confirmPassword: "",
   });
-  const { loading, register } = useRegister();
+  const { loading, register } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
