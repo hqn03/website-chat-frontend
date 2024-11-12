@@ -16,6 +16,7 @@ function Profile() {
     new_password: "",
     confirm_password: "",
   });
+  console.log(formState);
 
   const { loading, update, changePassword } = useProfile();
 
@@ -32,6 +33,7 @@ function Profile() {
   const handleChangeAvatar = async (e) => {
     const file = e.target.files[0];
     const dataUrl = await toDataURL(file);
+    console.log(dataUrl);
     setFormState({ ...formState, avatar: dataUrl });
   };
 

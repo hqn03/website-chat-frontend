@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import useForgot from "../hooks/useReset";
+import useAuth from "../hooks/useAuth";
 
 function Forgot() {
   const [formState, setFormState] = useState({ email: "" });
-  const { loading, sendEmail } = useForgot();
+  const { loading, sendEmail } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();

@@ -1,11 +1,10 @@
 import { useState } from "react";
-import useLogin from "../hooks/useLogin";
-import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 
 function Login() {
   const [formState, setFormState] = useState({ email: "", password: "" });
-  const { loading, login } = useLogin();
+  const { loading, login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();

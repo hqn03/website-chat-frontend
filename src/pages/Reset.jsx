@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
-import useForgot from "../hooks/useReset";
+import useAuth from "../hooks/useAuth";
 
 function Reset() {
   const { uid, token } = useParams();
-  const { loading, reset } = useForgot();
+  const { loading, reset } = useAuth();
   const [formState, setFormState] = useState({
     uid: uid,
     token: token,
