@@ -19,7 +19,7 @@ function App() {
   return (
     <BrowserRouter>
       <ToastContainer
-        autoClose={3000}
+        autoClose={1000}
         pauseOnFocusLoss={false}
         pauseOnHover={false}
       />

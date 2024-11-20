@@ -17,6 +17,7 @@ function useUser() {
       return data;
     } catch (error) {
       toast.error("Can't get list user.");
+      throw error;
     } finally {
       setLoading(false);
     }
