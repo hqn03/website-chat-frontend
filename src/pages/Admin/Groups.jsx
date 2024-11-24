@@ -16,7 +16,10 @@ function Groups() {
   const [selectedRoom, setSelectedRoom] = useState(null);
 
   useEffect(() => {
-    getRooms().then((data) => setRooms(data));
+    getRooms().then((data) => {
+      console.log(data);
+      setRooms(data);
+    });
   }, []);
 
   const handleSubmitAddForm = async (e) => {

@@ -1,17 +1,24 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
-import { ChatIcon, LogoutIcon, ProfileIcon } from "../components/Icon";
+import { AddIcon, ChatIcon, LogoutIcon, ProfileIcon } from "../components/Icon";
 import defaultAvatar from "../assets/default-user.jpg";
 import useAuth from "../hooks/useAuth";
 import Modal from "../components/Modal/Modal";
 import Profile from "./Home/Profile";
 import useShow from "../hooks/useShow";
+import FormAddRoom from "./Home/FormAddRoom";
+import { useEffect } from "react";
+import { apiGetRoomsUser } from "../api";
 
 function Home() {
   const { authUser } = useAuthContext();
   const [showProfile, toggleShowProfile] = useShow();
+  const [showRoom, toggleShowRoom] = useShow();
   const { logout } = useAuth();
 
+  useEffect(() => {
+    apiGetRoomsUser().then((data) => console.log(data));
+  }, []);
   return (
     <div className="h-screen bg-gray-950 flex">
       {/* sidebar */}
@@ -29,6 +36,15 @@ function Home() {
             <ChatIcon className="size-8 mx-auto" />
             <span className="text-sm">All chat</span>
           </NavLink>
+          {authUser.role === "moderate" && (
+            <div
+              className="my-1 block hover:text-white hover:bg-gray-700 rounded p-1 cursor-pointer"
+              onClick={toggleShowRoom}
+            >
+              <AddIcon className="size-8 m-auto" />
+              <span className="text-sm">Create room</span>
+            </div>
+          )}
           <div
             className="my-1 block hover:text-white hover:bg-gray-700 rounded p-1 cursor-pointer"
             onClick={toggleShowProfile}
@@ -50,6 +66,10 @@ function Home() {
       </div>
       <Modal open={showProfile} onClose={toggleShowProfile}>
         <Profile />
+      </Modal>
+
+      <Modal open={showRoom} onClose={toggleShowRoom}>
+        <FormAddRoom toggleShow={toggleShowRoom} />
       </Modal>
     </div>
   );

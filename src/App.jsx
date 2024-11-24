@@ -44,7 +44,8 @@ function App() {
         <Route path="password-reset-confirm/:uid/:token" element={<Reset />} />
 
         <Route path="/" element={<Home />}>
-          <Route path="/chat" element={<Chat />} />
+          <Route path="/chat/" element={<Chat />} />
+          <Route path="/chat/:roomName" element={<Chat />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
         <Route path="/admin" element={<Admin />}>

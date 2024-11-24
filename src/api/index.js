@@ -35,3 +35,6 @@ export const apiCreateRoom = (data) => api.post("/accounts/rooms/", data);
 export const apiUpdateRoom = (data) =>
   api.put(`/accounts/rooms/${data.id}/`, data);
 export const apiDeleteRoom = (id) => api.delete(`/accounts/rooms/${id}/`);
+
+// user/room
+export const apiGetRoomsUser = () => api.get("/chats/room-member-ship/");

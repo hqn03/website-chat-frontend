@@ -16,7 +16,6 @@ function Profile() {
     new_password: "",
     confirm_password: "",
   });
-  console.log(formState);
 
   const { loading, update, changePassword } = useProfile();
 
