@@ -22,15 +22,21 @@ function Users() {
   const { loading, getUsers, createUser, updateRole, deleteUser } = useUser();
 
   useEffect(() => {
-    getUsers().then((data) => setUsers(data));
+    getUsers()
+      .then((data) => {
+        setUsers(data);
+      })
+      .catch((error) => console.log(error));
   }, []);
 
   //   Add function
   const handleSubmitAddForm = async (e) => {
     e.preventDefault();
     const dataUser = await createUser(formAdd);
-    handleResetAddForm();
-    setUsers([...users, dataUser]);
+    if (dataUser) {
+      handleResetAddForm();
+      setUsers([...users, dataUser]);
+    }
   };
   const handleResetAddForm = () => {
     toggleShowAdd();
@@ -98,7 +104,7 @@ function Users() {
             <th scope="col" className="px-4 py-2">
               verified
             </th>
-            <th scope="col" colSpan={2} className="px-4 py-2">
+            <th scope="col" colSpan={3} className="px-4 py-2">
               action
             </th>
           </tr>
@@ -110,6 +116,14 @@ function Users() {
               <td className="px-4 py-2">{user.email}</td>
               <td className="px-4 py-2">{user.role}</td>
               <td className="px-4 py-2">{user.is_verified ? "yes" : "no"}</td>
+              <td className="px-4 py-2">
+                <button
+                  className="text-blue-500 hover:underline"
+                  onClick={() => console.log("reset")}
+                >
+                  Reset password
+                </button>
+              </td>
               <td className="px-4 py-2">
                 <button
                   className="text-blue-500 hover:underline"
@@ -155,7 +169,7 @@ function Users() {
             </label>
             <input
               id="email"
-              type="text"
+              type="email"
               className="p-1 border-gray-500 border-2 border-solid rounded-md"
               value={formAdd.email}
               onChange={(e) =>
@@ -268,7 +282,6 @@ function Users() {
         <div className="mt-4">
           Do you really want delete user
           <span className="font-medium text-red-500">
-            {" "}
             {selectedUser?.email}
           </span>
         </div>

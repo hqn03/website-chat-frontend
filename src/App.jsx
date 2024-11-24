@@ -19,7 +19,7 @@ function App() {
   return (
     <BrowserRouter>
       <ToastContainer
-        autoClose={3000}
+        autoClose={1000}
         pauseOnFocusLoss={false}
         pauseOnHover={false}
       />
@@ -44,7 +44,8 @@ function App() {
         <Route path="password-reset-confirm/:uid/:token" element={<Reset />} />
 
         <Route path="/" element={<Home />}>
-          <Route path="/chat" element={<Chat />} />
+          <Route path="/chat/" element={<Chat />} />
+          <Route path="/chat/:roomName" element={<Chat />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
         <Route path="/admin" element={<Admin />}>

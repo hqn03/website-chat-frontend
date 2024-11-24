@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import useShow from "../hooks/useShow";
+import { EyeIcon, EyeSlashIcon } from "../components/Icon/Icon";
 
 function Login() {
   const [formState, setFormState] = useState({ email: "", password: "" });
   const { loading, login } = useAuth();
+  const [show, toggleShow] = useShow();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -12,7 +15,7 @@ function Login() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-slate-300">
+    <div className="flex justify-center items-center h-screen bg-slate-300 ">
       <div className="bg-white p-8 rounded-xl w-[400px]">
         <div className="text-4xl uppercase text-center font-semibold">
           login
@@ -32,7 +35,7 @@ function Login() {
               }
             />
           </div>
-          <div className="mt-4">
+          <div className="mt-4 relative cursor-pointer select-none">
             <label
               htmlFor="password"
               className="block font-medium text-gray-900"
@@ -41,13 +44,20 @@ function Login() {
             </label>
             <input
               id="password"
-              type="password"
-              className="border-2 border-gray-500 rounded-md p-1 w-full"
+              type={show ? "text" : "password"}
+              className="border-2 border-gray-500 rounded-md p-1 w-full pr-9"
               value={formState.password}
               onChange={(e) =>
                 setFormState({ ...formState, password: e.target.value })
               }
             />
+            <div className="absolute top-7 right-2" onClick={toggleShow}>
+              {show ? (
+                <EyeSlashIcon className="size-6" />
+              ) : (
+                <EyeIcon className="size-6" />
+              )}
+            </div>
           </div>
           <div className="flex justify-between">
             <Link to="/register" className="hover:text-blue-400">
