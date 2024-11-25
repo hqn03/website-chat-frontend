@@ -7,8 +7,6 @@ import Modal from "../components/Modal/Modal";
 import Profile from "./Home/Profile";
 import useShow from "../hooks/useShow";
 import FormAddRoom from "./Home/FormAddRoom";
-import { useEffect } from "react";
-import { apiGetRoomsUser } from "../api";
 
 function Home() {
   const { authUser } = useAuthContext();
@@ -16,9 +14,6 @@ function Home() {
   const [showRoom, toggleShowRoom] = useShow();
   const { logout } = useAuth();
 
-  useEffect(() => {
-    apiGetRoomsUser().then((data) => console.log(data));
-  }, []);
   return (
     <div className="h-screen bg-gray-950 flex">
       {/* sidebar */}

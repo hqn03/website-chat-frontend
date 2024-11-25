@@ -4,6 +4,7 @@ import {
   apiDeleteRoom,
   apiGetRooms,
   apiUpdateRoom,
+  apiAddUserToRoom,
 } from "../api";
 import { useState } from "react";
 
@@ -58,14 +59,36 @@ function useRoom() {
       toast.success("Delete room successfully.");
       return true;
     } catch (error) {
-      toast.success("Delete room failed.");
+      toast.error("Delete room failed.");
       return false;
     } finally {
       setLoading(false);
     }
   };
 
-  return { loading, getRooms, createRoom, updateRoom, deleteRoom };
+  const addUserToRoom = async (formData) => {
+    setLoading(true);
+    try {
+      const { data } = await apiAddUserToRoom(formData);
+      toast.success("Add user to room successfully.");
+      console.log(data);
+      return true;
+    } catch (error) {
+      toast.error("Add user to room failed.");
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    loading,
+    getRooms,
+    createRoom,
+    updateRoom,
+    deleteRoom,
+    addUserToRoom,
+  };
 }
 
 export default useRoom;

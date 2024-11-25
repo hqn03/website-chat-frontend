@@ -31,7 +31,7 @@ function App() {
               authUser.role === "admin" ? (
                 <Navigate to={"/admin"} />
               ) : (
-                <Navigate to={"/"} />
+                <Navigate to={"/chat"} />
               )
             ) : (
               <Navigate to={"/login"} />
