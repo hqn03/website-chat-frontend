@@ -7,7 +7,8 @@ api.interceptors.request.use((req) => {
     req.headers.Authorization =
       "Token " + JSON.parse(localStorage.getItem("userInfo")).token;
   }
-  console.log("token:   ", req.headers.Authorization);
+
+  console.log(req);
   return req;
 });
 
@@ -37,4 +38,7 @@ export const apiUpdateRoom = (data) =>
 export const apiDeleteRoom = (id) => api.delete(`/accounts/rooms/${id}/`);
 
 // user/room
-export const apiGetRoomsUser = () => api.get("/chats/room-member-ship/");
+export const apiGetRoomsUser = (id) =>
+  api.get(`/chats/room-member-ship/?user=${id}`);
+export const apiAddUserToRoom = (data) =>
+  api.post(`/chats/room-member-ship/`, data);
