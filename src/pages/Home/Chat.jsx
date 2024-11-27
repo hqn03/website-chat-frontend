@@ -1,8 +1,8 @@
 import { useParams } from "react-router-dom";
 import Message from "../../components/Message/Message";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
-import { apiGetUsers } from "../../api";
+import { apiGetMessage, apiGetUserAddToRoom } from "../../api";
 import Rooms from "./Rooms";
 import useShow from "../../hooks/useShow";
 import Modal from "../../components/Modal/Modal";
@@ -12,30 +12,40 @@ function Chat() {
   const { roomName } = useParams();
   const [socket, setSocket] = useState(null);
   const [message, setMessage] = useState("");
+  const [rooms, setRooms] = useState([]);
   const { authUser } = useAuthContext();
 
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
 
-  const username = authUser.username;
+  const userId = authUser.id;
 
   const [addUser, toggleAddUser] = useShow();
   const [form, setForm] = useState({});
   const { loading, addUserToRoom } = useRoom();
 
+  const messagesEndRef = useRef(null);
+
   useEffect(() => {
-    apiGetUsers().then(({ data }) => setUsers(data));
+    apiGetUserAddToRoom(roomName).then(({ data }) => setUsers(data));
+  }, [addUser]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  useLayoutEffect(() => {
+    apiGetMessage(roomName).then(({ data }) => setMessages(data));
 
     setForm({ room: roomName, user: null });
-
     if (roomName) {
       const ws = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomName}/`);
       setSocket(ws);
 
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
+        console.log(data);
         setMessages((prev) => [...prev, data]);
-        // setMessages((prevMessages) => [...prevMessages, data]);
       };
 
       ws.onopen = () => {
@@ -54,8 +64,9 @@ function Chat() {
     if (socket && message.trim() !== "") {
       socket.send(
         JSON.stringify({
-          message,
-          username,
+          room: roomName,
+          content: message,
+          user: userId,
         })
       );
       setMessage("");
@@ -69,12 +80,14 @@ function Chat() {
 
   return (
     <div className="h-full flex justify-between gap-2">
-      <Rooms />
+      <Rooms rooms={rooms} setRooms={setRooms} />
       {roomName ? (
         <div className="bg-white flex-1 rounded-lg flex flex-col overflow-hidden">
           <div className="flex p-2 gap-4 items-center border-b-2">
             <div className="size-12 bg-slate-300 rounded-full "></div>
-            <div className="flex-1">Name room</div>
+            <div className="flex-1">
+              {rooms.find((i) => i?.room == roomName)?.room_name}
+            </div>
             {authUser.role === "moderate" && (
               <div
                 className="hover:bg-slate-300 cursor-pointer"
@@ -86,12 +99,12 @@ function Chat() {
 
             <div>call</div>
           </div>
-          <div className="flex-1 p-2">
+          <div ref={messagesEndRef} className="flex-1 p-2 overflow-y-scroll">
             {messages.map((message, index) => (
               <Message
-                me={message.username === authUser.username}
+                me={message.user == authUser.id}
                 key={index}
-                message={message.message}
+                message={message.content}
               />
             ))}
           </div>
