@@ -7,8 +7,6 @@ api.interceptors.request.use((req) => {
     req.headers.Authorization =
       "Token " + JSON.parse(localStorage.getItem("userInfo")).token;
   }
-
-  console.log(req);
   return req;
 });
 
@@ -42,3 +40,7 @@ export const apiGetRoomsUser = (id) =>
   api.get(`/chats/room-member-ship/?user=${id}`);
 export const apiAddUserToRoom = (data) =>
   api.post(`/chats/room-member-ship/`, data);
+export const apiGetUserAddToRoom = (id) =>
+  api.get(`/chats/rooms/${id}/available-users/`);
+
+export const apiGetMessage = (id) => api.get(`/chats/messages/?room=${id}`);

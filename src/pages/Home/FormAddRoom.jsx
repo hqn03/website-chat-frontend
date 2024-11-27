@@ -1,13 +1,20 @@
 import { useState } from "react";
 import useRoom from "../../hooks/useRoom";
+import { useAuthContext } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function FormAddRoom({ toggleShow }) {
+  const { authUser } = useAuthContext();
   const [name, setName] = useState("");
   const { loading, createRoom } = useRoom();
+  const { addUserToRoom } = useRoom();
+  const navigate = useNavigate();
 
   const handleSubmitAddForm = async (e) => {
     e.preventDefault();
-    const result = await createRoom(name);
+    const { id } = await createRoom(name);
+    const dataInput = { room: id, user: authUser.id };
+    addUserToRoom(dataInput).then(() => navigate(`chat/${id}`));
     handleResetAddForm();
   };
   const handleResetAddForm = () => {
