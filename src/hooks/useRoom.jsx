@@ -5,6 +5,7 @@ import {
   apiGetRooms,
   apiUpdateRoom,
   apiAddUserToRoom,
+  apiDeleteUserFromRoom,
 } from "../api";
 import { useState } from "react";
 
@@ -81,6 +82,21 @@ function useRoom() {
     }
   };
 
+  const deleteUserFromRoom = async (room, user) => {
+    setLoading(true);
+    try {
+      const { data } = await apiDeleteUserFromRoom(room, user);
+      toast.success("Delete user from room successfully.");
+      console.log(data);
+      return true;
+    } catch (error) {
+      toast.error("Delete user from room failed.");
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     loading,
     getRooms,
@@ -88,6 +104,7 @@ function useRoom() {
     updateRoom,
     deleteRoom,
     addUserToRoom,
+    deleteUserFromRoom,
   };
 }
 

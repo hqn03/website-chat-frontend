@@ -40,7 +40,11 @@ export const apiGetRoomsUser = (id) =>
   api.get(`/chats/room-member-ship/?user=${id}`);
 export const apiAddUserToRoom = (data) =>
   api.post(`/chats/room-member-ship/`, data);
+export const apiDeleteUserFromRoom = (room_id, user_id) =>
+  api.delete(`/chats/room-member-ship/${room_id}/?user=${user_id}`);
 export const apiGetUserAddToRoom = (id) =>
   api.get(`/chats/rooms/${id}/available-users/`);
+export const apiGetUserDeleteFromRoom = (id) =>
+  api.get(`/chats/rooms/${id}/remove-users-from-room/`);
 
 export const apiGetMessage = (id) => api.get(`/chats/messages/?room=${id}`);
