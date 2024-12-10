@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import Message from "../../components/Message/Message";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
 import { apiDeleteUserFromRoom, apiGetMessage, apiGetUserAddToRoom, apiGetUserDeleteFromRoom } from "../../api";
 import Rooms from "./Rooms";
@@ -66,12 +66,40 @@ function Chat() {
       const ws = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomName}/`);
       setSocket(ws);
 
+      // ws.onmessage = (event) => {
+      //   const data = JSON.parse(event.data);
+      //   console.log(data);
+      //   setMessages((prev) => [...prev, data]);
+      // };
+
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        console.log(data);
-        setMessages((prev) => [...prev, data]);
+      
+        if (data.action === "delete_message") {
+          setMessages((prevMessages) =>
+            prevMessages.filter((message) => message.id !== data.message_id)
+          );
+        } else if (data.action === "pin_message") {
+            setMessages((prevMessages) =>
+              prevMessages.map((message) =>
+                message.id === data.message_id
+                  ? { ...message, is_pinned: true }
+                  : message
+              )
+            );
+        } else if (data.action === "unpin_message") {
+            setMessages((prevMessages) =>
+              prevMessages.map((message) =>
+                message.id === data.message_id
+                  ? { ...message, is_pinned: false }
+                  : message
+              )
+            );
+        }
+        else {
+          setMessages((prevMessages) => [...prevMessages, data]);
+        }
       };
-
       ws.onopen = () => {
         console.log("WebSocket Connected room,", roomName);
       };
@@ -117,6 +145,50 @@ function Chat() {
     }
   };
 
+  const deleteMessage = (messageId) => {
+    if (socket) {
+      socket.send(
+        JSON.stringify({
+          action: "delete_message",
+          message_id: messageId,
+        })
+      );
+    }
+  };
+
+  const pinMessage = (messageId, isPinned) => {
+    if (socket) {
+      socket.send(
+        JSON.stringify({
+          action: "pin_message",
+          message_id: messageId,
+          is_pinned: isPinned,
+        })
+      );
+    }
+  };
+
+  const handlePinToggle = (messageId, isPinned) => {
+    
+    // setMessages((prevMessages) =>
+    //     prevMessages.map((msg) =>
+    //         msg.id === messageId ? { ...msg, is_pinned: !msg.is_pinned } : msg
+    //   )
+    // );
+
+    setMessages((prevMessages) =>
+      prevMessages.map((msg) =>
+        msg.id === messageId
+          ? { ...msg, is_pinned: !msg.is_pinned }
+          : msg
+      )
+    );
+    
+    pinMessage(messageId, isPinned);
+    
+  };
+  
+
   const handleSubmitForm = (e) => {
     e.preventDefault();
     addUserToRoom(form);
@@ -126,6 +198,9 @@ function Chat() {
     console.log(form);
     deleteUserFromRoom(form.room, form.user);
   };
+
+
+  // console.log(messages);
 
   return (
     <div className="h-full flex justify-between gap-2">
@@ -142,7 +217,7 @@ function Chat() {
                 className="hover:bg-slate-300 cursor-pointer"
                 onClick={() => toggleAddUser()}
               >
-                add user
+                Add user
               </div>
             )}
             {authUser.role === "moderate" && (
@@ -150,21 +225,42 @@ function Chat() {
                 className="hover:bg-slate-300 cursor-pointer"
                 onClick={() => toggleDeleteUser()}
               >
-                delete user
+                Delete user
               </div>
             )}
 
-            <div>call</div>
+            <div>Call</div>
+          </div>
+          <div className="pinned-messages bg-yellow-100 p-2">
+              <h3>Pinned Messages</h3>
+              {messages
+                .filter((msg) => msg.is_pinned && msg.content)
+                .map((pinnedMessage) => (
+                  <Message
+                    key={pinnedMessage.id}
+                    message={pinnedMessage.content}
+                    old_file = {pinnedMessage.attachment}
+                    file={pinnedMessage.file}
+                    is_pinned={true}
+                  />
+                ))}
           </div>
           <div ref={messagesEndRef} className="flex-1 p-2 overflow-y-scroll">
-            {messages.map((message, index) => (
+            {messages
+            .filter((msg) => msg.content)
+            .map((message, index) => (
               <div>
                 <Message
-                  me={message.user == authUser.id}
                   key={index}
+                  user={users.find(i => i.id == message.user)}
+                  me={message.user == authUser.id}
                   message={message.content}
                   old_file = {message.attachment}
                   file={message.file}
+                  id = {message.id}
+                  deleteMessage={(messageId) => deleteMessage(messageId)}
+                  is_pinned={message.is_pinned}
+                  handlePinToggle={(messageId, isPinned) => handlePinToggle(messageId, isPinned)}
                 />
               </div>
             ))}
